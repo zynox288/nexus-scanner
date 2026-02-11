@@ -105,7 +105,7 @@
         
         .pin-display {
             font-family: 'Courier New', monospace;
-            font-size: 3rem; /* Larger font for 5 chars to look good */
+            font-size: 3rem;
             text-align: center;
             color: var(--red-bright);
             background: #000;
@@ -113,7 +113,7 @@
             border-radius: 5px;
             border: 1px solid var(--red-dim);
             margin: 10px 0;
-            letter-spacing: 8px; /* Wide spacing for style */
+            letter-spacing: 8px;
         }
 
         .status-indicator {
@@ -215,17 +215,21 @@
     </div>
 
     <script>
+        // CONFIGURATION: Your Discord Client ID
+        const CLIENT_ID = '1471203475663622376';
         const API_URL = 'http://127.0.0.1:3000/api';
 
-        // 1. Login Simulation
+        // 1. Login Function
         function login() {
             const btn = document.querySelector('.discord-btn');
             btn.innerHTML = 'Authenticating...';
             
+            // NOTE: Real Discord Auth requires a backend server due to CORS.
+            // This simulates the process for the GitHub site demo.
             setTimeout(() => {
                 document.getElementById('login-view').style.display = 'none';
                 document.getElementById('dashboard-view').style.display = 'block';
-                checkConnection(); // Start polling
+                checkConnection();
             }, 1000);
         }
 
@@ -238,10 +242,7 @@
                     document.getElementById('status-text').innerText = 'Connected to Local Core';
                     document.getElementById('connection-warning').style.display = 'none';
                     
-                    // Update Scan Status
                     document.getElementById('scan-status').innerText = data.scanning ? 'SCANNING...' : 'IDLE';
-                    
-                    // Load other data
                     loadPIN();
                     loadResults();
                 })
@@ -293,9 +294,7 @@
                 .catch(() => {});
         }
 
-        // Poll every 2 seconds
         setInterval(checkConnection, 2000);
-
     </script>
 </body>
 </html>
