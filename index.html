@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS | Security Dashboard</title>
+    <style>
+        :root {
+            --bg-dark: #050000;
+            --bg-panel: #1a0505;
+            --red-dim: #5c0b0b;
+            --red-bright: #ff1f1f;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --discord-blurple: #5865F2;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-view {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #2a0505 0%, #000000 100%);
+        }
+
+        .login-box {
+            background: var(--bg-panel);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.2);
+            border: 1px solid var(--red-dim);
+            width: 350px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--red-bright);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px var(--red-bright);
+        }
+
+        .discord-btn {
+            background-color: var(--discord-blurple);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .discord-btn:hover { background-color: #4752c4; }
+
+        /* --- DASHBOARD SCREEN --- */
+        #dashboard-view {
+            display: none;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--red-dim);
+            margin-bottom: 30px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--red-dim);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .card h3 { margin-top: 0; color: var(--red-bright); text-transform: uppercase; font-size: 0.9rem; }
+        
+        .pin-display {
+            font-family: 'Courier New', monospace;
+            font-size: 3rem; /* Larger font for 5 chars to look good */
+            text-align: center;
+            color: var(--red-bright);
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid var(--red-dim);
+            margin: 10px 0;
+            letter-spacing: 8px; /* Wide spacing for style */
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-indicator.online { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
+
+        .result-item {
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 3px solid var(--red-bright);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .threat-name { color: var(--red-bright); font-weight: bold; }
+
+        button.action-btn {
+            background: var(--red-dim);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        button.action-btn:hover { background: var(--red-bright); }
+
+        .connection-warning {
+            background: #5c1818;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view">
+        <div class="login-box">
+            <div class="logo">NEXUS</div>
+            <p style="color: #888;">Advanced Security System</p>
+            
+            <button class="discord-btn" onclick="login()">
+                <!-- Discord Icon SVG -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.946 2.419-2.157 2.419z"/></svg>
+                Login with Discord
+            </button>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboard-view">
+        <nav>
+            <div class="logo" style="font-size: 1.5rem; margin:0;">NEXUS</div>
+            <div style="display: flex; align-items: center;">
+                <span class="status-indicator" id="status-dot"></span>
+                <span id="status-text" style="font-size: 0.9rem; color: #888;">Checking Connection...</span>
+            </div>
+        </nav>
+
+        <div class="connection-warning" id="connection-warning">
+            ⚠️ Cannot connect to Local Scanner. Please ensure the NEXUS Scanner.exe is running on Port 3000.
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- PIN Card -->
+            <div class="card">
+                <h3>Security PIN (5 Chars)</h3>
+                <div class="pin-display" id="pin-display">...</div>
+                <button class="action-btn" onclick="generatePIN()">Generate New PIN</button>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">Use this PIN in the Desktop Scanner App</p>
+            </div>
+
+            <!-- Scan Control -->
+            <div class="card">
+                <h3>Scanner Control</h3>
+                <p style="color: #aaa;">The scanner is controlled via the Desktop App. Status:</p>
+                <div id="scan-status" style="font-weight: bold; color: var(--red-bright); margin-top: 10px;">IDLE</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>Live Scan Results</h3>
+            <div id="results-container">
+                <p style="color: #666;">Waiting for scan data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:3000/api';
+
+        // 1. Login Simulation
+        function login() {
+            const btn = document.querySelector('.discord-btn');
+            btn.innerHTML = 'Authenticating...';
+            
+            setTimeout(() => {
+                document.getElementById('login-view').style.display = 'none';
+                document.getElementById('dashboard-view').style.display = 'block';
+                checkConnection(); // Start polling
+            }, 1000);
+        }
+
+        // 2. Check Connection to C++ Tool
+        function checkConnection() {
+            fetch(`${API_URL}/status`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('status-dot').classList.add('online');
+                    document.getElementById('status-text').innerText = 'Connected to Local Core';
+                    document.getElementById('connection-warning').style.display = 'none';
+                    
+                    // Update Scan Status
+                    document.getElementById('scan-status').innerText = data.scanning ? 'SCANNING...' : 'IDLE';
+                    
+                    // Load other data
+                    loadPIN();
+                    loadResults();
+                })
+                .catch(err => {
+                    document.getElementById('status-dot').classList.remove('online');
+                    document.getElementById('status-text').innerText = 'Disconnected';
+                    document.getElementById('connection-warning').style.display = 'block';
+                });
+        }
+
+        // 3. Generate PIN
+        function generatePIN() {
+            fetch(`${API_URL}/generate-pin`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('pin-display').innerText = data.pin;
+                });
+        }
+
+        function loadPIN() {
+            fetch(`${API_URL}/pin`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.pin) document.getElementById('pin-display').innerText = data.pin;
+                })
+                .catch(() => {}); 
+        }
+
+        // 4. Load Results
+        function loadResults() {
+            fetch(`${API_URL}/results`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('results-container');
+                    if (data.length === 0) {
+                        container.innerHTML = '<p style="color: #666;">No threats detected.</p>';
+                        return;
+                    }
+                    container.innerHTML = '';
+                    data.forEach(item => {
+                        container.innerHTML += `
+                            <div class="result-item">
+                                <div class="threat-name">${item.threat}</div>
+                                <div style="color:#aaa; font-family:monospace;">${item.path}</div>
+                            </div>
+                        `;
+                    });
+                })
+                .catch(() => {});
+        }
+
+        // Poll every 2 seconds
+        setInterval(checkConnection, 2000);
+
+    </script>
+</body>
+</html>
